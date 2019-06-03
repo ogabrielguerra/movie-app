@@ -1,7 +1,7 @@
-#MOVIE APP
+# MOVIE APP
 A React App which consumes data from The Movie DB API
 
-##The Problem / Bottleneck
+## The Problem / Bottleneck
 Typically for this kind of App images are the bottleneck followed by number of requests.
 
 To follow the requirements would be necessary to show more than the 20 initial images, so we had to gain more control over the data, in order to avoid to many API requests.
