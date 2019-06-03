@@ -68,4 +68,4 @@ Since data is loaded, we fetch (fetchData()) filtered objects and render.
 
 
 
-
+* * *
