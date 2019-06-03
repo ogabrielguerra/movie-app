@@ -1,6 +1,12 @@
 # MOVIE APP
 A React App which consumes data from The Movie DB API
 
+**App Url**   
+https://gabrielguerra.me/movie-app/
+
+**PHP API Url**  
+https://gabrielguerra.me/movie-app-api/
+
 ## The Problem / Bottleneck
 Typically for this kind of App images are the bottleneck followed by number of requests.
 
