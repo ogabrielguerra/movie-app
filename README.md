@@ -19,10 +19,31 @@ In this API a cache builder was coded to:
 3. Create a json file containing all movies objects
 4. Create a json file containing all genres objects
 
+### Endpoints
+* **/build**
+Build cache, writing json and files to the cache directory.
+
+* **/movies**
+Returns a cached json for movies
+
+* **/movie/?id={id}**
+Returns a cached json for movies
+
+* **/genres**
+Returns a cached json for genres
+
+* **/movies-genres/?ids={id1,id2,id3}**
+Returns a json with genres names
+
+* **/poster/?imgRef={imgReference}**
+Returns a json with the path of a cached image (poster)
+
 #### Running the cache builder
 Just go to this url: https://www.gabrielguerra.me/movie-app-api/build/
 
 In the future we could control cache expiration or manipulate data easily favoring implementation of new feature.
+
+
 
 ## App Strategy / Architecture
 
