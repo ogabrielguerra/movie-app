@@ -14,7 +14,7 @@ class App extends React.Component{
                 <div className="header">
                     <div className="container">
                         <div className="row">
-                            <div className="col-md-12"><h1>Movie App</h1></div>
+                            <div className="col-md-12"><h3>Movie App | <span>Upcoming Movies</span></h3></div>
                         </div>
                     </div>
                 </div>

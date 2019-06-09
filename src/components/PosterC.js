@@ -5,30 +5,47 @@ import ImageLoader from 'react-load-image';
 
 class PosterC extends Base{
 
+    state = {
+        hasLoaded : ""
+    }
+
     constructor(props){
         super(props)
         this.basePath = super.getPath();
         this.imageUrl="";
     }
 
-    // componentDidMount() {
     componentWillMount() {
         if(this.props.image!=="" && this.props.image!==null){
             let image = this.props.image;
-            this.imageUrl = './assets/posters'+image;
+            this.imageUrl = this.basePath+'assets/posters'+image;
         }
     }
 
-    render(){
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        if(this.state.hasLoaded !== nextState.hasLoaded){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
-            // console.log("poster")
+    onLoad = () => {
+        this.setState(
+            {
+                hasLoaded : "imageHasLoaded"
+            }
+        )
+    };
+
+    render(){
+            let notFound = this.basePath+'assets/not-found.jpg';
             return(
                 <ImageLoader src={this.imageUrl}>
-                    <img alt="Movie Poster"/>
-                    <div><img src="./assets/not-found.jpg" alt="poster" /></div>
+                    <img alt="Movie Poster" onLoad={this.onLoad} className={this.state.hasLoaded}/>
+                    <div><img src={notFound} className="imageHasLoaded" alt="poster" /></div>
                     <Loader/>
                 </ImageLoader>
-
             )
     }
 }

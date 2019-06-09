@@ -3,8 +3,8 @@ import React from 'react';
 class Base extends React.Component{
     constructor(props){
         super(props);
-        // this.path = '/';
-        this.path = '/movie-app/';
+        this.path = '/';
+        // this.path = '/movie-app/';
     }
 
     dateFormat(date){
