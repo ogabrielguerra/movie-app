@@ -4,64 +4,76 @@ import Movie from "./Movie";
 import Loader from "./Loader";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-class MoviesGrid extends React.Component{
-    constructor(props){
-        super(props)
 
-        this.iniUrl = "/movie-app-api/movies/"
-        this.numMoviesPerPage = 20
+class MoviesGrid extends React.Component {
 
-        this.state = {
-            moviesDataFromApi : "",
-            iniMovies : "",
-            filtered : "",
-            movies : [],
-            dataReady : "",
-            curPage : 1,
-            start : 0,
-            end : 20
+    state = {
+        moviesDataFromApi: "",
+        filtered: "",
+        filteredFirstTime : "",
+        movies: [],
+        dataReady: "",
+        curPage: 1,
+        start: 0,
+        end: 20
 
-        }
+    }
+
+    constructor(props) {
+        super(props);
+
+        this.iniUrl = "/movie-app-api/movies/";
+        this.numMoviesPerPage = 20;
 
         this.onChange = this.onChange.bind(this);
         this.nextPage = this.nextPage.bind(this);
         this.priorPage = this.priorPage.bind(this);
     }
 
-    componentDidMount() {
-        this.loadData()
+    componentWillMount() {
+        this.loadData();
+    }
+
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        if(this.state.filtered !== nextState.filtered){
+            return true
+        }else{
+            return false
+        }
     }
 
     loadData(){
         axios.get(this.iniUrl)
-
             .then((movies) => {
-                movies = movies.data;
-                this.setState({
-                    moviesDataFromApi : movies
-                }, () => {
-                    this.fetchData(0,20);
-                });
-        })
+                movies = movies.data
+                this.fetchData(movies, true);
+            })
+            .then(()=>{
+                return true
+            });
     }
 
-    fetchData(){
 
-        if(this.state.moviesDataFromApi!==""){
+    fetchData(movies, init=false){
 
             let filtered;
+            let defaultMovies;
+
+            if(init){
+                defaultMovies = movies
+            }else{
+                defaultMovies = this.state.moviesDataFromApi
+            }
 
             new Promise((resolve)=> {
-                resolve(
-                )
+                resolve(movies)
 
             }).then(()=>{
-
                 let j=0;
-
-                filtered = this.state.moviesDataFromApi.filter((movie)=>{
+                filtered = movies.filter((movie)=>{
                     if(j>=this.state.start && j<this.state.end){
                         j++
+
                         return movie
                     }else{
                         j++
@@ -70,23 +82,15 @@ class MoviesGrid extends React.Component{
                 })
 
             }).then(()=>{
-
-                let iniMovies;
-
-                if(this.state.iniMovies===""){
-                    iniMovies = filtered
-                }else{
-                    iniMovies = this.state.iniMovies
-                }
-
                 this.setState({
                     filtered : filtered,
-                    iniMovies : iniMovies,
-                    dataReady : true
+                    filteredFirstTime : filtered,
+                    dataReady : true,
+                    moviesDataFromApi : defaultMovies
                 })
-            })
-        }
-
+            }).catch((e)=>{
+                console.log(e, " An embarrassing error *_*")
+            });
     }
 
     handlePages(){
@@ -106,7 +110,7 @@ class MoviesGrid extends React.Component{
             start : start,
             end : end
         }, ()=>{
-            this.fetchData()
+            this.fetchData(this.state.moviesDataFromApi)
         })
     }
 
@@ -134,39 +138,46 @@ class MoviesGrid extends React.Component{
 
     onChange(e){
         e.preventDefault();
+
         let needle = this.refs.search.value.toLowerCase();
         let filtered = [];
-        let defaultState = this.state.iniMovies;
+        let defaultState = this.state.filteredFirstTime;
 
-        if(needle !== undefined && needle.length>1){
-            new Promise(resolve => {
-                resolve(
-                    filtered = this.state.moviesDataFromApi.filter((movie)=>{
-                        if(movie.title.toLowerCase().indexOf(needle)!==-1){
-                            return movie
-                        }else{
-                            return ""
+        //Delay the event a bit
+        setTimeout(()=>{
+
+            if(needle !== undefined && needle.length>1){
+                new Promise(resolve => {
+                    resolve(
+                        filtered = this.state.moviesDataFromApi.filter((movie)=>{
+                            if(movie.title.toLowerCase().indexOf(needle)!==-1){
+                                return movie
+                            }else{
+                                return ""
+                            }
+                        })
+                    )
+                })
+                    .then(()=>{
+                        if(filtered.length>0){
+                            this.setState({
+                                filtered : filtered
+                            })
                         }
                     })
-                )
-            })
-            .then(()=>{
-                if(filtered.length>0){
-                    this.setState({
-                        filtered : filtered
-                    })
-                }
 
-            })
+            }else{
+                this.setState({
+                    filtered : defaultState
+                })
+            }
 
-        }else{
-            this.setState({
-                filtered : defaultState
-            })
-        }
+        }, 250);
+
     }
 
     render(){
+
         if(this.state.dataReady===true) {
             return (
                 <div className="container">
@@ -194,10 +205,9 @@ class MoviesGrid extends React.Component{
                     </div>
 
                     <div className="row">
-
                         {
                             this.state.filtered.map((obj)=>
-                                <Movie key={obj.id} data={obj}/>
+                                <Movie key={obj.id} data={obj} />
                             )
                         }
                     </div>

@@ -9,21 +9,21 @@ import axios from "axios";
 import Genre from "./Genre";
 
 class Movie extends Base{
+
+    state=(
+        {
+            data : this.props.data,
+            posterState : "show",
+            detailsState : "hide details",
+            toHome : false,
+            genresNames : [],
+        }
+    )
+
     constructor(props){
         super(props)
         this.path = super.getPath();
-
-        this.state=(
-            {
-                ready : false,
-                data : this.props.data,
-                posterState : "show",
-                detailsState : "hide details",
-                toHome : false,
-                genresNames : [],
-                updatedId : ""
-            }
-        )
+        this._isMounted = false;
 
         // Binds
         this.onMouseOver = this.onMouseOver.bind(this);
@@ -32,7 +32,8 @@ class Movie extends Base{
 
     }
 
-    componentDidMount() {
+    // componentDidMount() {
+    componentWillMount() {
         let urlGenres = `/movie-app-api/movie-genres/?ids=${this.state.data.genre_ids}`;
         axios.get(urlGenres)
             .then((response)=>{
@@ -43,6 +44,14 @@ class Movie extends Base{
                     }
                 )
             })
+    }
+
+    shouldComponentUpdate(nextState) {
+        if(this.state.genresNames !== nextState.genresNames){
+            return true
+        }else{
+            return false
+        }
     }
 
     onMouseOver(){
@@ -73,7 +82,10 @@ class Movie extends Base{
         let imagePath = this.props.data.poster_path;
 
         if(!this.state.toHome){
-            if(this.state.ready===true){
+
+            if(!this.state.genresNames){
+                return(<div><Loader/></div>)
+            }else{
                 return (
                     <div className="col-md-3">
                         <div className="movie" onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut}>
@@ -101,12 +113,8 @@ class Movie extends Base{
                         </div>
                     </div>
                 );
-
-            }else{
-                return (
-                    <Loader/>
-                )
             }
+
         }else{
             let url = `${this.path}movie/${this.state.data.id}`;
 
