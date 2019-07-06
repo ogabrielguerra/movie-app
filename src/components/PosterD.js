@@ -3,7 +3,7 @@ import Loader from './Loader';
 import Base from './Base';
 import ImageLoader from 'react-load-image';
 
-class PosterC extends Base{
+class PosterD extends Base{
 
     state = {
         hasLoaded : ""
@@ -13,6 +13,7 @@ class PosterC extends Base{
         super(props)
         this.basePath = super.getPath();
         this.imageUrl="";
+	    this.notFound = this.basePath+'assets/not-found.jpg';
     }
 
 	componentDidMount() {
@@ -26,7 +27,10 @@ class PosterC extends Base{
     componentWillMount() {
         if(this.props.image!=="" && this.props.image!==null){
             let image = this.props.image;
-            this.imageUrl = this.basePath+'assets/posters'+image;
+            this.imageUrl = 'https://image.tmdb.org/t/p/w342/'+image;
+            // this.imageUrl = this.basePath+'assets/posters'+image;
+        }else{
+	        this.imageUrl = this.notFound;
         }
     }
 
@@ -48,16 +52,19 @@ class PosterC extends Base{
 	    }
     };
 
+    onError = ()=>{
+        console.log('error loading image')
+    }
+
     render(){
-            let notFound = this.basePath+'assets/not-found.jpg';
             return(
                 <ImageLoader src={this.imageUrl}>
-                    <img alt="Movie Poster" onLoad={this.onLoad} className={this.state.hasLoaded}/>
-                    <div><img src={notFound} className="imageHasLoaded" alt="poster" /></div>
+                    <img alt="Movie Poster" onError={this.onError} onLoad={this.onLoad} className={this.state.hasLoaded}/>
+                    <div><img src={this.notFound} className="imageHasLoaded" alt="poster" /></div>
                     <Loader/>
                 </ImageLoader>
             )
     }
 }
 
-export default PosterC;
+export default PosterD;

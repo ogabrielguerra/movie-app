@@ -1,5 +1,4 @@
 import React from 'react'
-import axios from "axios";
 import Movie from "./Movie";
 import Loader from "./Loader";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -9,7 +8,7 @@ class MoviesGrid extends React.Component {
 
     state = {
         moviesDataFromApi: "",
-        filtered: "",
+        moviesFiltered: "",
         filteredFirstTime : "",
         movies: [],
         dataReady: "",
@@ -28,63 +27,97 @@ class MoviesGrid extends React.Component {
         this.priorPage = this.priorPage.bind(this);
     }
 
-    componentWillMount() {
-        this.loadData();
+	componentWillMount() {
+		this.loadData().then((data)=>{
+			this.sortMovies(data, true)
+		}).catch((e)=>{
+			console.log('ERROR in [componentWillMount] ', e)
+		})
     }
 
-    shouldComponentUpdate(nextProps, nextState, nextContext) {
-        if(this.state.filtered !== nextState.filtered){
+    componentDidMount() {
+	    this._isMounted = true;
+    }
+
+	componentWillUnmount() {
+		this._isMounted = false;
+    }
+
+	shouldComponentUpdate(nextProps, nextState, nextContext) {
+        if(this.state.moviesFiltered !== nextState.moviesFiltered){
             return true
         }else{
             return false
         }
     }
 
-    loadData(){
-        axios.get(this.iniUrl)
-            .then((movies) => {
-                movies = movies.data
-                this.fetchData(movies, true);
-            })
-            .then(()=>{
-                return true
-            });
+    async loadData(){
+    	return Promise.resolve(
+		    fetch(this.iniUrl)
+			    .then(response => response.json())
+			    .then((data)=>{
+				    // Sort Movies for the first time
+				    // this.sortMovies(data, true)
+				    return data;
+			    }).catch((e)=>{
+			        console.log('ERROR IN [loadData] ', e)
+		    })
+	    )
     }
 
-    fetchData(movies, init=false){
+	// async testMe(){
+	//
+	// 	return Promise.resolve(
+	// 		fetch(this.iniUrl)
+	// 		.then(response => response.json())
+	// 		.then((data)=>{
+	// 			console.log("data fetched")
+	// 			return(data[0]);
+	// 		}).catch((e)=>{
+	// 			console.log(e)
+	// 		})
+	// 	)
+	// }
+
+    sortMovies(movies, init=false){
+    	// console.log("Sorting Movies... ");
+
             let filtered;
             let defaultMovies;
 
+            //If Default Movies are defined, just use them. If not set the state
             if(init){
                 defaultMovies = movies
             }else{
                 defaultMovies = this.state.moviesDataFromApi
             }
 
-            new Promise((resolve)=> {
-                resolve(movies)
+            new Promise((resolve, reject)=> {
+	            let j=0;
+
+	            resolve(
+		            filtered = movies.filter((movie)=>{
+			            if(j>=this.state.start && j<this.state.end){
+				            j++
+				            return movie
+			            }else{
+				            j++
+				            return ""
+			            }
+		            })
+                )
 
             }).then(()=>{
-                let j=0;
-                filtered = movies.filter((movie)=>{
-                    if(j>=this.state.start && j<this.state.end){
-                        j++
-                        return movie
-                    }else{
-                        j++
-                        return ""
-                    }
-                })
-
-            }).then(()=>{
-                this.setState({
-                    filtered : filtered,
-                    filteredFirstTime : filtered,
-                    dataReady : true,
-                    moviesDataFromApi : defaultMovies
-                })
+	            if (this._isMounted) {
+		            this.setState({
+			            moviesFiltered: filtered,
+			            filteredFirstTime: filtered,
+			            dataReady: true,
+			            moviesDataFromApi: defaultMovies
+		            })
+	            }
             }).catch((e)=>{
-                console.log(e, " An embarrassing error *_*")
+                console.log("ERROR IN [sortMovies] ", e)
             });
     }
 
@@ -100,31 +133,37 @@ class MoviesGrid extends React.Component {
 
         end = start + this.numMoviesPerPage;
 
-        this.setState({
-            start : start,
-            end : end
-        }, ()=>{
-            this.fetchData(this.state.moviesDataFromApi)
-        })
+	    if (this._isMounted) {
+		    this.setState({
+			    start: start,
+			    end: end
+		    }, () => {
+			    this.sortMovies(this.state.moviesDataFromApi)
+		    })
+	    }
     }
 
     nextPage(){
         if(this.state.curPage < 10) {
-            this.setState({
-                curPage: this.state.curPage + 1
-            },()=>{
-                this.handlePages()
-            })
+	        if (this._isMounted) {
+		        this.setState({
+			        curPage: this.state.curPage + 1
+		        }, () => {
+			        this.handlePages()
+		        })
+	        }
         }
     }
 
     priorPage(){
         if(this.state.curPage > 1){
-            this.setState({
-                curPage: this.state.curPage - 1
-            },()=>{
-                this.handlePages()
-            })
+	        if (this._isMounted) {
+		        this.setState({
+			        curPage: this.state.curPage - 1
+		        }, () => {
+			        this.handlePages()
+		        })
+	        }
         }
     }
 
@@ -148,15 +187,15 @@ class MoviesGrid extends React.Component {
                     }
                 })
 
-                if(this.state.filtered != filtered){
+                if(this.state.moviesFiltered !== filtered){
                     this.setState({
-                        filtered : filtered
+	                    moviesFiltered : filtered
                     })
                 }
 
             }else{
                 this.setState({
-                    filtered : defaultState
+	                moviesFiltered : defaultState
                 })
             }
 
@@ -166,8 +205,8 @@ class MoviesGrid extends React.Component {
     render(){
 
         const RenderMe = ()=>{
-            if(this.state.filtered.length > 0){
-                return ( this.state.filtered.map((obj)=> <Movie key={obj.id} data={obj} />) )
+            if(this.state.moviesFiltered.length > 0){
+                return ( this.state.moviesFiltered.map((obj)=> <Movie key={obj.id} data={obj} />) )
             }else{
                 return (
                     <div className="col-12 text-center mt-5 mb-5"><h2>No movie found :(</h2></div>

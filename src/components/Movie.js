@@ -1,5 +1,5 @@
 import React from 'react';
-import PosterC from './PosterC';
+import Poster from './PosterD';
 import Base from './Base';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -32,18 +32,29 @@ class Movie extends Base{
 
     }
 
-    // componentDidMount() {
+	componentDidMount() {
+		this._isMounted = true;
+	}
+
+	componentWillUnmount() {
+		this._isMounted = false;
+	}
+
     componentWillMount() {
         let urlGenres = `/movie-app-api/movie-genres/?ids=${this.state.data.genre_ids}`;
         axios.get(urlGenres)
             .then((response)=>{
-                this.setState(
-                    {
-                        ready : true,
-                        genresNames : this.state.genresNames.concat(response.data)
-                    }
-                )
-            })
+	            if (this._isMounted) {
+		            this.setState(
+			            {
+				            ready: true,
+				            genresNames: this.state.genresNames.concat(response.data)
+			            }
+		            )
+	            }
+            }).catch((e)=>{
+            	console.log('ERROR IN [componentWillMount] ', e)
+        })
     }
 
     shouldComponentUpdate(nextState) {
@@ -56,31 +67,37 @@ class Movie extends Base{
 
     onMouseOver(){
         if(this.state.ready===true) {
-            this.setState({
-                posterState: "hide",
-                detailsState: "show details"
-            })
+	        if (this._isMounted) {
+		        this.setState({
+			        posterState: "hide",
+			        detailsState: "show details"
+		        })
+	        }
         }
     }
 
     onMouseOut(){
-        this.setState({
-            posterState : "show",
-            detailsState : "hide details"
-        })
+	    if (this._isMounted) {
+		    this.setState({
+			    posterState: "show",
+			    detailsState: "hide details"
+		    })
+	    }
     }
 
     sendDetails(e){
         e.preventDefault();
-        this.setState({
-            toHome : true,
-            data : this.props.data
-        })
+	    if (this._isMounted) {
+		    this.setState({
+			    toHome: true,
+			    data: this.props.data
+		    })
+	    }
     }
 
     render(){
         let imagePath = this.props.data.poster_path;
-
+		// console.log(imagePath)
         if(!this.state.toHome){
 
             if(!this.state.genresNames){
@@ -91,7 +108,7 @@ class Movie extends Base{
                         <div className="movie" onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut}>
                             <div className="imageBox">
                                 <div ref="posterBox">
-                                    <PosterC image={imagePath} />
+                                    <Poster image={imagePath} />
                                 </div>
 
                                 <div className={this.state.detailsState}>
