@@ -1,58 +1,69 @@
 import React from 'react';
-import axios from "axios";
 import Loader from './Loader';
+import Base from './Base';
 import ImageLoader from 'react-load-image';
 
-class Poster extends React.Component{
-    constructor(props){
-        super(props)
-        this.basePath = "/movie-app-api/poster/?imgRef=";
-        this.state = (
-            {
-                imageReady : false,
-                imageError : ""
-            }
-        );
+class Poster extends Base{
+
+    state = {
+        hasLoaded : ""
     }
 
-    componentDidMount() {
+    constructor(props){
+        super(props)
+        this.basePath = super.getPath();
+        this.imageUrl="";
+	    this.notFound = this.basePath+'assets/not-found.jpg';
+    }
 
+	componentDidMount() {
+		this._isMounted = true;
+	}
+
+	componentWillUnmount() {
+		this._isMounted = false;
+	}
+
+    componentWillMount() {
         if(this.props.image!=="" && this.props.image!==null){
-
-            let image = this.props.image.substring(1);
-            this.imageUrl = this.basePath+image;
-
-            axios.get(this.imageUrl)
-                .then((response)=>{
-                    this.setState(
-                        {
-                            imageReady : true,
-                            image : response.data
-                        }
-                    )
-                })
+            let image = this.props.image;
+            this.imageUrl = 'https://image.tmdb.org/t/p/w342/'+image;
+            // this.imageUrl = this.basePath+'assets/posters'+image;
+        }else{
+	        this.imageUrl = this.notFound;
         }
+    }
+
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        if(this.state.hasLoaded !== nextState.hasLoaded){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    onLoad = () => {
+	    if (this._isMounted) {
+		    this.setState(
+			    {
+				    hasLoaded: "imageHasLoaded"
+			    }
+		    )
+	    }
+    };
+
+    onError = ()=>{
+        console.log('error loading image')
     }
 
     render(){
-        if(this.state.imageReady===true){
             return(
-                <ImageLoader src={this.state.image}>
-                    <img alt="Movie Poster"/>
-                    <div>Error!</div>
+                <ImageLoader src={this.imageUrl}>
+                    <img alt="Movie Poster" onError={this.onError} onLoad={this.onLoad} className={this.state.hasLoaded}/>
+                    <div><img src={this.notFound} className="imageHasLoaded" alt="poster" /></div>
                     <Loader/>
                 </ImageLoader>
-
             )
-        }else if(this.state.imageError===true){
-            return(
-                <div><img src="assets/not-found.jpg" alt="poster" /></div>
-                )
-        }else{
-            return(
-                <div><Loader/></div>
-            )
-        }
     }
 }
 

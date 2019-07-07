@@ -1,5 +1,5 @@
 import React from 'react';
-import Poster from './PosterD';
+import Poster from './Poster';
 import Base from './Base';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

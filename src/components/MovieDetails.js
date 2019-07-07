@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import PosterC from "./PosterC";
+import Poster from "./Poster";
 import Base from './Base';
 import axios from "axios";
 import Loader from "./Loader";
@@ -25,7 +25,7 @@ class MovieDetails extends Base{
 
     componentWillMount() {
 
-    let id = this.props.match.params.id;
+        let id = this.props.match.params.id;
         let urlMovie =  `/movie-app-api/movie/?id=${id}`;
         let urlGenres;
 
@@ -74,7 +74,7 @@ class MovieDetails extends Base{
                                 <div className="col-md-4">
                                     <div className="imageBox">
                                         <div ref="posterBox">
-                                            <PosterC image={this.state.imagePath} />
+                                            <Poster image={this.state.imagePath} />
                                         </div>
                                     </div>
                                 </div>

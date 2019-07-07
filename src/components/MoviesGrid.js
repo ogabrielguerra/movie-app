@@ -3,7 +3,6 @@ import Movie from "./Movie";
 import Loader from "./Loader";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-
 class MoviesGrid extends React.Component {
 
     state = {
