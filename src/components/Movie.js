@@ -5,7 +5,6 @@ import Base from './Base';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Redirect } from 'react-router-dom';
 import Loader from "./Loader";
-import axios from "axios";
 import Genre from "./Genre";
 
 class Movie extends Base{
@@ -23,12 +22,11 @@ class Movie extends Base{
     constructor(props){
         super(props)
         this.path = super.getPath();
-        this._isMounted = false;
 
         // Binds
         this.onMouseOver = this.onMouseOver.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
-        this.sendDetails = this.sendDetails.bind(this);
+        this.showMovieDetails = this.showMovieDetails.bind(this);
 
     }
 
@@ -42,19 +40,22 @@ class Movie extends Base{
 
     componentWillMount() {
         let urlGenres = `/movie-app-api/movie-genres/?ids=${this.state.data.genre_ids}`;
-        axios.get(urlGenres)
-            .then((response)=>{
-	            if (this._isMounted) {
-		            this.setState(
-			            {
-				            ready: true,
-				            genresNames: this.state.genresNames.concat(response.data)
-			            }
-		            )
-	            }
-            }).catch((e)=>{
-            	console.log('ERROR IN [componentWillMount] ', e)
-        })
+
+
+        fetch(urlGenres)
+	        .then((response)=>response.json())
+	        .then((data)=>{
+		        if (this._isMounted) {
+			        this.setState(
+                        {
+                            ready: true,
+                            genresNames: this.state.genresNames.concat(data)
+                        }
+                    )
+		        }
+	        }).catch((e)=>{
+	                console.log('ERROR IN [componentWillMount] ', e)
+	        })
     }
 
     shouldComponentUpdate(nextState) {
@@ -85,7 +86,7 @@ class Movie extends Base{
 	    }
     }
 
-    sendDetails(e){
+    showMovieDetails(e){
         e.preventDefault();
 	    if (this._isMounted) {
 		    this.setState({
@@ -113,7 +114,7 @@ class Movie extends Base{
 
                                 <div className={this.state.detailsState}>
                                     <div className="details" >
-                                        <button className="btn btn-primary btn-lg" onClick={this.sendDetails} >See details</button>
+                                        <button className="btn btn-primary btn-lg" onClick={this.showMovieDetails} >See details</button>
                                     </div>
                                 </div>
                             </div>
