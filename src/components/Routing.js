@@ -23,7 +23,7 @@ class Routing extends Base{
 
                     <Route
                         path={this.path+"movie/:id"}
-                        component={() => <MovieDetails />}
+                        component={() => <MovieDetails genres="a, b"/>}
                     />
             </Router>
         );

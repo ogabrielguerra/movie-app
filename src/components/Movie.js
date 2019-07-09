@@ -135,9 +135,9 @@ class Movie extends Base{
 
         }else{
             let url = `${this.path}movie/${this.state.data.id}`;
-
+			let genres = this.state.genresNames;
             return(
-                <Redirect from="/" to={{pathname:url, state:{} }} />
+                <Redirect from="/" to={{pathname:url, state:{genres:genres} }} />
             )
         }
     }

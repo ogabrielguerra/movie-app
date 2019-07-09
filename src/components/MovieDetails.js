@@ -18,16 +18,15 @@ class MovieDetails extends Base{
             releaseDate : "",
             overview : "",
             imagePath : "",
-            genresNames : [],
-            genresIds : ""
         };
     }
 
     componentWillMount() {
-
         let id = this.props.match.params.id;
         let urlMovie =  `/movie-app-api/movie/?id=${id}`;
-        let urlGenres;
+
+        //Get genres' names from props (passed by Movie comp) *
+        this.genresNames = this.props.location.state.genres;
 
         axios.get(urlMovie)
             .then((response)=>{
@@ -36,27 +35,21 @@ class MovieDetails extends Base{
                         title : response.data.title,
                         releaseDate : response.data.release_date,
                         overview : response.data.overview,
-                        genresIds : response.data.genre_ids,
                         imagePath : response.data.poster_path
                     }
                 )
-                urlGenres = `/movie-app-api/movie-genres/?ids=${this.state.genresIds}`;
-            }).then(()=>{
-
-                axios.get(urlGenres)
-                .then((response)=>{
-                    this.setState(
-                        {
-                            genresNames : this.state.genresNames.concat(response.data)
-                        }
-                    )
-                })
+        }).catch((e)=>{
+        	console.log("ERROR");
         })
     }
 
-    render(){
+    componentDidMount() {
+    	console.log(this.props.location.state.genres)
+    }
 
-        if(this.state.genresNames!==undefined && this.state.imagePath !== ""){
+	render(){
+
+        if(this.state.imagePath !== ""){
 
             return(
                 <div className="container">
@@ -80,7 +73,8 @@ class MovieDetails extends Base{
                                 </div>
                                 <div className="col-md-8">
                                     <h1>{this.state.title}</h1>
-                                    { this.state.genresNames.map((genre, key)=> <Genre name={genre} key={key}/> ) }
+	                                {this.genresNames.map((genre, key)=> <Genre name={genre} key={key}/> )}
+                                    {/*{ this.state.genresNames.map((genre, key)=> <Genre name={genre} key={key}/> ) }*/}
 
                                     <div className="releaseDate mt-2">
                                         <FontAwesomeIcon icon="calendar-alt"/> Release Date: {this.dateFormat(this.state.releaseDate)}
