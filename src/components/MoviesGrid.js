@@ -1,9 +1,10 @@
 import React from 'react'
+import Base from './Base';
 import Movie from "./Movie";
 import Loader from "./Loader";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-class MoviesGrid extends React.Component {
+class MoviesGrid extends Base {
 
     state = {
         moviesDataFromApi: "",
@@ -18,12 +19,17 @@ class MoviesGrid extends React.Component {
     }
 
     constructor(props) {
+
         super(props);
-        this.iniUrl = "/movie-app-api/movies/";
+        this.iniUrl = `${this.getApiPath()}movies`;
         this.numMoviesPerPage = 20;
         this.onChange = this.onChange.bind(this);
         this.nextPage = this.nextPage.bind(this);
         this.priorPage = this.priorPage.bind(this);
+
+        //Push this path to History obj
+	    this.path = super.getPath();
+        this.setHistory(this.path)
     }
 
 	componentWillMount() {
@@ -63,20 +69,6 @@ class MoviesGrid extends React.Component {
 		    })
 	    )
     }
-
-	// async testMe(){
-	//
-	// 	return Promise.resolve(
-	// 		fetch(this.iniUrl)
-	// 		.then(response => response.json())
-	// 		.then((data)=>{
-	// 			console.log("data fetched")
-	// 			return(data[0]);
-	// 		}).catch((e)=>{
-	// 			console.log(e)
-	// 		})
-	// 	)
-	// }
 
     sortMovies(movies, init=false){
     	// console.log("Sorting Movies... ");

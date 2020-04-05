@@ -1,10 +1,18 @@
 import React from 'react';
+import History from './History';
 
 class Base extends React.Component{
     constructor(props){
+
         super(props);
+        this.env = process.env.NODE_ENV;
         this.path = '/';
-        // this.path = '/movie-app/';
+
+        if(this.env === 'development'){
+            this.apiPath = 'http://localhost/public/';
+        }else if (this.env === 'production'){
+            this.apiPath = 'http://apis.gabrielguerra.me/movie-app/v2/';
+        }
     }
 
     dateFormat(date){
@@ -14,6 +22,14 @@ class Base extends React.Component{
 
     getPath(){
         return this.path;
+    }
+
+    getApiPath(){
+        return this.apiPath;
+    }
+
+    setHistory(path){
+	    History.push(path);
     }
 }
 

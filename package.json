@@ -2,7 +2,7 @@
   "name": "movie-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "/",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.19",
     "@fortawesome/free-solid-svg-icons": "^5.9.0",
@@ -39,5 +39,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://www.gabrielguerra.me:80"
+  "proxy": "http://localhost:80/"
 }

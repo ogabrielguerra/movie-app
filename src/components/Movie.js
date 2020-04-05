@@ -39,23 +39,31 @@ class Movie extends Base{
 	}
 
     componentWillMount() {
-        let urlGenres = `/movie-app-api/movie-genres/?ids=${this.state.data.genre_ids}`;
+        // console.log(this.state.data.genre_ids);
 
+        let genresIds = this.state.data.genre_ids;
 
-        fetch(urlGenres)
-	        .then((response)=>response.json())
-	        .then((data)=>{
-		        if (this._isMounted) {
-			        this.setState(
-                        {
-                            ready: true,
-                            genresNames: this.state.genresNames.concat(data)
-                        }
-                    )
-		        }
-	        }).catch((e)=>{
-	                console.log('ERROR IN [componentWillMount] ', e)
-	        })
+        // let urlGenres = `http://apis.gabrielguerra.me/movie-app/movie-genres/?ids=${this.state.data.genre_ids}`;
+        let urlGenres = `${this.getApiPath()}genres/names/${genresIds}`;
+
+        if(typeof genresIds != "undefined" && genresIds != null && genresIds.length != null && genresIds.length > 0){
+
+            fetch(urlGenres)
+                .then((response)=>response.json())
+                .then((data)=>{
+                    if (this._isMounted) {
+                        this.setState(
+                            {
+                                ready: true,
+                                genresNames: this.state.genresNames.concat(data)
+                            }
+                        )
+                    }
+                }).catch((e)=>{
+                console.log('ERROR IN [componentWillMount] ', e)
+            })
+        }
+
     }
 
     shouldComponentUpdate(nextState) {
@@ -98,7 +106,7 @@ class Movie extends Base{
 
     render(){
         let imagePath = this.props.data.poster_path;
-		// console.log(imagePath)
+
         if(!this.state.toHome){
 
             if(!this.state.genresNames){
@@ -135,9 +143,12 @@ class Movie extends Base{
 
         }else{
             let url = `${this.path}movie/${this.state.data.id}`;
-			let genres = this.state.genresNames;
             return(
-                <Redirect from="/" to={{pathname:url, state:{genres:genres} }} />
+                <Redirect from="/" to={
+                	{
+                		pathname:url, genres:this.state.genresNames, data:this.props.data
+                	}
+                } />
             )
         }
     }

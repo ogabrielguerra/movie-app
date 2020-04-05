@@ -1,7 +1,7 @@
 import React from 'react';
 import Routing from "./components/Routing";
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEnvelope, faKey, faCalendarAlt, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faKey, faCalendarAlt, faAngleLeft, faAngleRight} from '@fortawesome/free-solid-svg-icons';
 
 library.add(faEnvelope, faKey, faCalendarAlt, faAngleLeft, faAngleRight);
 
