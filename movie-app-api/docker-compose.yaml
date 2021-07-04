@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+  webserver:
+    container_name: movie-app
+    build: ./
+    image: lamp_server
+    ports:
+      - "81:80"
+      - "443:443"
+    volumes:
+      - ./www:/var/www/html
+    links:
+      - db
+
+  db:
+    image: mysql:5.7
+    command: --disable-partition-engine-check
+    ports: 
+      - "3306:3306"
+    expose:
+      - "3306"
+    volumes:
+      - ./db_data:/var/lib/mysql
+      - ./dump:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=dbpassword
+      - MYSQL_DATABASE=execrio_app_associados
+
+volumes:
+  db_data: {}
+
+ 
